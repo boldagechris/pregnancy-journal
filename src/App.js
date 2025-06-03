@@ -156,6 +156,9 @@ const useTranslation = () => {
       midwifeName: 'Jordemoder Anne',
       ultrasoundClinic: 'Ultralydsklinik',
       videoCallComingSoon: 'Videoopkald kommer snart!',
+      minMidwife: 'Min jordemoder',
+      midwifeBackground: 'Anne har arbejdet som jordemoder i over 12 år og har stor erfaring med både fødsler og svangreomsorg. Hun er kendt for sin empati og sit rolige væsen.',
+      midwifeAffiliation: 'Roskilde Sygehus, Fødselafdeling',
     },
     
     en: {
@@ -254,6 +257,9 @@ const useTranslation = () => {
       midwifeName: 'Midwife Anne',
       ultrasoundClinic: 'Ultrasound Clinic',
       videoCallComingSoon: 'Video call feature coming soon!',
+      minMidwife: 'My midwife',
+      midwifeBackground: 'Anne has worked as a midwife for over 12 years and has extensive experience with both births and prenatal care. She is known for her empathy and calm demeanor.',
+      midwifeAffiliation: 'Roskilde Hospital, Maternity Ward',
     }
   };
 
@@ -299,12 +305,23 @@ const LanguageSwitcher = ({ language, onLanguageChange }) => (
   </div>
 );
 
+// Midwife avatar component
+const MidwifeAvatar = ({ size = 20, className = "" }) => (
+  <img
+    src="/images/midwife-icon.jpg"
+    alt="Midwife"
+    className={`inline-block rounded-full object-cover border-2 border-blue-200 align-middle mr-2 ${className}`}
+    style={{ width: size, height: size, minWidth: size, minHeight: size }}
+  />
+);
+
 // Main App Component
 const FixedPregnancyApp = () => {
   const { t, language, changeLanguage } = useTranslation();
   const [currentView, setCurrentView] = useState('home');
   const [showGdprModal, setShowGdprModal] = useState(true);
   const [showMidwifeModal, setShowMidwifeModal] = useState(false);
+  const [showMidwifeProfile, setShowMidwifeProfile] = useState(false);
   const [partnerSharing, setPartnerSharing] = useState({
     isEnabled: false,
     partnerName: 'Lars Hansen'
@@ -430,12 +447,12 @@ const FixedPregnancyApp = () => {
             {/* Midwife Info */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl mb-6">
               <div className="flex items-center space-x-3 mb-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-200 flex items-center justify-center bg-white">
+                  <MidwifeAvatar size={20} />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-800">{t('yourMidwife')}</h3>
-                  <p className="text-sm text-gray-600">Jordemoder Anne</p>
+                  <p className="text-sm text-gray-600 flex items-center"><MidwifeAvatar size={20} />Jordemoder Anne</p>
                   <p className="text-xs text-gray-500">{t('department')}</p>
                 </div>
               </div>
@@ -510,6 +527,29 @@ const FixedPregnancyApp = () => {
     </div>
   );
 
+  // Midwife Profile Modal
+  const MidwifeProfileModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl max-w-sm w-full p-6">
+        <div className="flex flex-col items-center mb-4">
+          <MidwifeAvatar size={64} />
+          <h2 className="text-xl font-semibold text-gray-800 mt-3">Jordemoder Anne</h2>
+          <p className="text-sm text-gray-500 mt-1">{t('midwifeAffiliation')}</p>
+        </div>
+        <div className="mb-6">
+          <h3 className="font-semibold text-gray-700 mb-2">{t('background') || (language === 'da' ? 'Baggrund' : 'Background')}</h3>
+          <p className="text-gray-700 text-sm">{t('midwifeBackground')}</p>
+        </div>
+        <button
+          onClick={() => setShowMidwifeProfile(false)}
+          className="w-full bg-amber-500 text-white py-3 px-4 rounded-xl font-medium"
+        >
+          {t('close')}
+        </button>
+      </div>
+    </div>
+  );
+
   // Header
   const Header = () => (
     <header className="bg-gradient-to-r from-amber-400 to-amber-500 text-white p-4 rounded-b-3xl shadow-lg">
@@ -566,27 +606,28 @@ const FixedPregnancyApp = () => {
   // Home View
   const HomeView = () => (
     <div className="p-4 space-y-6">
-      {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-2xl border border-amber-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-amber-700 font-medium">{t('currentWeight')}</p>
-              <p className="text-2xl font-bold text-amber-800">{pregnancyData.currentWeight} kg</p>
-            </div>
-            <Weight className="w-8 h-8 text-amber-600" />
-          </div>
+      {/* Quick Stats as 3-column grid */}
+      <div className="grid grid-cols-3 gap-4">
+        {/* Min Jordemoder Button */}
+        <button
+          onClick={() => setShowMidwifeProfile(true)}
+          className="flex flex-col items-center justify-center bg-white border border-blue-200 text-blue-700 py-4 rounded-2xl font-semibold shadow hover:bg-blue-50 transition-colors h-full min-h-[160px]"
+        >
+          <MidwifeAvatar size={64} className="mb-2" />
+          <span className="text-xs text-center leading-tight mt-2">{t('minMidwife')}</span>
+        </button>
+        {/* Current Weight */}
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-2xl border border-amber-200 flex flex-col items-center justify-center h-full min-h-[110px]">
+          <p className="text-sm text-amber-700 font-medium">{t('currentWeight')}</p>
+          <p className="text-2xl font-bold text-amber-800">{pregnancyData.currentWeight} kg</p>
+          <Weight className="w-8 h-8 text-amber-600 mt-2" />
         </div>
-        
-        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-2xl border border-green-200">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-green-700 font-medium">{t('fetalHeartRate')}</p>
-              <p className="text-2xl font-bold text-green-800">{pregnancyData.fetalHeartRate}</p>
-              <p className="text-xs text-green-600">{t('beatsPerMin')}</p>
-            </div>
-            <Heart className="w-8 h-8 text-green-600" />
-          </div>
+        {/* Fetal Heart Rate */}
+        <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-2xl border border-green-200 flex flex-col items-center justify-center h-full min-h-[110px]">
+          <p className="text-sm text-green-700 font-medium">{t('fetalHeartRate')}</p>
+          <p className="text-2xl font-bold text-green-800">{pregnancyData.fetalHeartRate}</p>
+          <p className="text-xs text-green-600">{t('beatsPerMin')}</p>
+          <Heart className="w-8 h-8 text-green-600 mt-2" />
         </div>
       </div>
 
@@ -621,7 +662,7 @@ const FixedPregnancyApp = () => {
                     <Info className="w-4 h-4 text-blue-600" />
                   </button>
                 </div>
-                <p className="text-sm text-gray-600">{entry.date} • {entry.provider}</p>
+                <p className="text-sm text-gray-600 flex items-center">{entry.date} • {entry.provider === t('midwifeName') || entry.provider === 'Jordemoder Anne' || entry.provider === 'Midwife Anne' ? <MidwifeAvatar size={16} /> : null}{entry.provider}</p>
               </div>
               <div className="text-right">
                 <p className="font-semibold text-amber-600">{entry.value}</p>
@@ -773,7 +814,7 @@ const FixedPregnancyApp = () => {
                       <Info className="w-4 h-4 text-blue-600" />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-600">{entry.date}</p>
+                  <p className="text-sm text-gray-600 flex items-center">{entry.date} • {entry.provider === t('midwifeName') || entry.provider === 'Jordemoder Anne' || entry.provider === 'Midwife Anne' ? <MidwifeAvatar size={16} /> : null}{entry.provider}</p>
                 </div>
                 <div className="text-right">
                   <p className="font-semibold text-blue-600">{entry.value}</p>
@@ -818,7 +859,7 @@ const FixedPregnancyApp = () => {
                 }`}>
                   {appointment.date} - {appointment.time}
                 </p>
-                <p className="text-xs text-gray-500">{appointment.provider}</p>
+                <p className="text-xs text-gray-500 flex items-center">{appointment.provider === t('midwifeName') || appointment.provider === 'Jordemoder Anne' || appointment.provider === 'Midwife Anne' ? <MidwifeAvatar size={14} /> : null}{appointment.provider}</p>
               </div>
             </div>
           ))}
@@ -1028,6 +1069,7 @@ const FixedPregnancyApp = () => {
     <div className="min-h-screen bg-gray-50">
       {showGdprModal && <GdprModal />}
       {showMidwifeModal && <MidwifeCommunicationModal />}
+      {showMidwifeProfile && <MidwifeProfileModal />}
       
       <div className="max-w-md mx-auto bg-gray-50 min-h-screen">
         <Header />
