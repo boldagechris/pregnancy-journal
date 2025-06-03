@@ -31,6 +31,29 @@ import {
   ExternalLink,
   BookOpen
 } from 'lucide-react';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 // Simple translation function
 const useTranslation = () => {
@@ -113,7 +136,15 @@ const useTranslation = () => {
       journalSavedDesc: 'Din journal er nu klar til næste møde med jordemoderen',
       sendToMidwife: 'Send til jordemoder',
       journalSent: 'Journal sendt!',
-      journalSentDesc: 'Din journal er nu sendt til jordemoderen'
+      journalSentDesc: 'Din journal er nu sendt til jordemoderen',
+      
+      // Weight Chart Translations
+      weightProgress: 'Vægtudvikling',
+      weightInformation: 'Vægtinformation',
+      normalWeightGain: 'Normal vægtøgning under graviditeten er typisk mellem 11,5-16 kg',
+      weightGainPattern: 'Mest vægtøgning sker i andet og tredje trimester',
+      currentTotalGain: 'Nuværende total vægtøgning',
+      weightUnit: 'kg',
     },
     
     en: {
@@ -192,7 +223,15 @@ const useTranslation = () => {
       journalSavedDesc: 'Your journal is now ready for the next midwife meeting',
       sendToMidwife: 'Send to midwife',
       journalSent: 'Journal sent!',
-      journalSentDesc: 'Your journal has been sent to the midwife'
+      journalSentDesc: 'Your journal has been sent to the midwife',
+      
+      // Weight Chart Translations
+      weightProgress: 'Weight Progress',
+      weightInformation: 'Weight Information',
+      normalWeightGain: 'Normal weight gain during pregnancy is typically between 11.5-16 kg',
+      weightGainPattern: 'Most weight gain occurs in the second and third trimesters',
+      currentTotalGain: 'Current total weight gain',
+      weightUnit: 'kg',
     }
   };
 
@@ -589,54 +628,141 @@ const FixedPregnancyApp = () => {
   );
 
   // Data View
-  const DataView = () => (
-    <div className="p-4 space-y-6">
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-200">
-        <div className="flex items-center space-x-3 mb-3">
-          <Activity className="w-6 h-6 text-blue-600" />
-          <h2 className="text-lg font-semibold text-gray-800">{t('data')}</h2>
-        </div>
-        <p className="text-sm text-gray-600">Your pregnancy data and measurements</p>
-      </div>
+  const DataView = () => {
+    const [showInfo, setShowInfo] = useState(false);
 
-      {/* Weight Chart Placeholder */}
-      <div className="bg-white p-4 rounded-2xl border border-gray-200">
-        <h3 className="font-semibold text-gray-800 mb-4">Weight Progress</h3>
-        <div className="h-32 bg-gray-100 rounded-xl flex items-center justify-center">
-          <TrendingUp className="w-8 h-8 text-gray-400" />
-        </div>
-      </div>
+    // Sample weight data for a pregnancy (starting from pre-pregnancy weight)
+    const weightData = {
+      labels: ['Uge 0', 'Uge 4', 'Uge 8', 'Uge 12', 'Uge 16', 'Uge 20', 'Uge 24', 'Uge 28'],
+      datasets: [
+        {
+          label: language === 'da' ? 'Vægt (kg)' : 'Weight (kg)',
+          data: [65.0, 65.2, 65.8, 66.5, 67.2, 68.0, 68.8, 68.5],
+          borderColor: 'rgb(245, 158, 11)', // amber-500
+          backgroundColor: 'rgba(245, 158, 11, 0.1)',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: 'rgb(245, 158, 11)',
+          pointBorderColor: '#fff',
+          pointBorderWidth: 2,
+        }
+      ]
+    };
 
-      {/* Recent Measurements */}
-      <div className="bg-white rounded-2xl border border-gray-200">
-        <div className="p-4 border-b border-gray-100">
-          <h3 className="font-semibold text-gray-800">All Measurements</h3>
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          titleColor: '#1f2937',
+          bodyColor: '#1f2937',
+          borderColor: '#e5e7eb',
+          borderWidth: 1,
+          padding: 12,
+          displayColors: false,
+          callbacks: {
+            label: function(context) {
+              return `${language === 'da' ? 'Vægt' : 'Weight'}: ${context.parsed.y.toFixed(1)} ${t('weightUnit')}`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          grid: {
+            color: 'rgba(0, 0, 0, 0.05)'
+          },
+          ticks: {
+            callback: function(value) {
+              return value.toFixed(1) + ' ' + t('weightUnit');
+            }
+          }
+        },
+        x: {
+          grid: {
+            display: false
+          }
+        }
+      }
+    };
+
+    return (
+      <div className="p-4 space-y-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-2xl border border-blue-200">
+          <div className="flex items-center space-x-3 mb-3">
+            <Activity className="w-6 h-6 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">{t('data')}</h2>
+          </div>
+          <p className="text-sm text-gray-600">Your pregnancy data and measurements</p>
         </div>
-        <div className="divide-y divide-gray-100">
-          {pregnancyData.recentEntries.map((entry, index) => (
-            <div key={index} className="p-4 flex items-center justify-between">
-              <div className="flex-1">
-                <div className="flex items-center space-x-3">
-                  <p className="font-medium text-gray-800">{entry.type}</p>
-                  <button
-                    onClick={() => window.open(entry.infoUrl, '_blank')}
-                    className="flex items-center justify-center w-6 h-6 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
-                    title="Læs mere på Sundhedsstyrelsen"
-                  >
-                    <Info className="w-4 h-4 text-blue-600" />
-                  </button>
-                </div>
-                <p className="text-sm text-gray-600">{entry.date}</p>
-              </div>
-              <div className="text-right">
-                <p className="font-semibold text-blue-600">{entry.value}</p>
-              </div>
+
+        {/* Weight Chart */}
+        <div className="bg-white p-4 rounded-2xl border border-gray-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-800">{t('weightProgress')}</h3>
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-600">{t('currentWeight')}: 68.5 {t('weightUnit')} ({t('week')} 28)</span>
+              <TrendingUp className="w-5 h-5 text-amber-500" />
             </div>
-          ))}
+          </div>
+          <div className="h-64">
+            <Line data={weightData} options={chartOptions} />
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={() => setShowInfo(!showInfo)}
+              className="flex items-center space-x-2 text-gray-600 hover:text-amber-600 transition-colors"
+            >
+              <Info className="w-5 h-5" />
+              <span className="text-sm">{t('weightInformation')}</span>
+            </button>
+          </div>
+          {showInfo && (
+            <div className="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200 text-sm text-gray-600">
+              <p>• {t('normalWeightGain')}</p>
+              <p>• {t('weightGainPattern')}</p>
+              <p>• {t('currentTotalGain')}: 3.5 {t('weightUnit')}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Recent Measurements */}
+        <div className="bg-white rounded-2xl border border-gray-200">
+          <div className="p-4 border-b border-gray-100">
+            <h3 className="font-semibold text-gray-800">All Measurements</h3>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {pregnancyData.recentEntries.map((entry, index) => (
+              <div key={index} className="p-4 flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center space-x-3">
+                    <p className="font-medium text-gray-800">{entry.type}</p>
+                    <button
+                      onClick={() => window.open(entry.infoUrl, '_blank')}
+                      className="flex items-center justify-center w-6 h-6 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
+                      title="Læs mere på Sundhedsstyrelsen"
+                    >
+                      <Info className="w-4 h-4 text-blue-600" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-gray-600">{entry.date}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-blue-600">{entry.value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Calendar View
   const CalendarView = () => (
