@@ -145,6 +145,17 @@ const useTranslation = () => {
       weightGainPattern: 'Mest vægtøgning sker i andet og tredje trimester',
       currentTotalGain: 'Nuværende total vægtøgning',
       weightUnit: 'kg',
+      
+      // Additional translations
+      pregnancyData: 'Dine graviditetsdata og målinger',
+      upcomingAppointments: 'Dine kommende aftaler',
+      notifications: 'Notifikationer',
+      privacy: 'Privatliv',
+      exportData: 'Eksporter data',
+      appPreferences: 'App indstillinger og kontoindstillinger',
+      midwifeName: 'Jordemoder Anne',
+      ultrasoundClinic: 'Ultralydsklinik',
+      videoCallComingSoon: 'Videoopkald kommer snart!',
     },
     
     en: {
@@ -232,6 +243,17 @@ const useTranslation = () => {
       weightGainPattern: 'Most weight gain occurs in the second and third trimesters',
       currentTotalGain: 'Current total weight gain',
       weightUnit: 'kg',
+      
+      // Additional translations
+      pregnancyData: 'Your pregnancy data and measurements',
+      upcomingAppointments: 'Your upcoming appointments',
+      notifications: 'Notifications',
+      privacy: 'Privacy',
+      exportData: 'Export Data',
+      appPreferences: 'App preferences and account settings',
+      midwifeName: 'Midwife Anne',
+      ultrasoundClinic: 'Ultrasound Clinic',
+      videoCallComingSoon: 'Video call feature coming soon!',
     }
   };
 
@@ -308,14 +330,14 @@ const FixedPregnancyApp = () => {
         date: '2025-06-03', 
         time: '10:00', 
         type: 'midwifeConsultation',
-        provider: 'Jordemoder Anne'
+        provider: t('midwifeName')
       },
       { 
         id: 2,
         date: '2025-06-15', 
         time: '14:30', 
         type: 'weekScan',
-        provider: 'Ultralydsklinik'
+        provider: t('ultrasoundClinic')
       }
     ],
     recentEntries: [
@@ -434,7 +456,7 @@ const FixedPregnancyApp = () => {
                 <span className="text-sm font-medium text-green-700">{t('callMidwife')}</span>
               </button>
               <button
-                onClick={() => alert('Video call feature coming soon!')}
+                onClick={() => alert(t('videoCallComingSoon'))}
                 className="flex flex-col items-center p-4 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition-colors"
               >
                 <Video className="w-6 h-6 text-purple-600 mb-2" />
@@ -699,7 +721,7 @@ const FixedPregnancyApp = () => {
             <Activity className="w-6 h-6 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-800">{t('data')}</h2>
           </div>
-          <p className="text-sm text-gray-600">Your pregnancy data and measurements</p>
+          <p className="text-sm text-gray-600">{t('pregnancyData')}</p>
         </div>
 
         {/* Weight Chart */}
@@ -772,7 +794,7 @@ const FixedPregnancyApp = () => {
           <Calendar className="w-6 h-6 text-green-600" />
           <h2 className="text-lg font-semibold text-gray-800">{t('calendar')}</h2>
         </div>
-        <p className="text-sm text-gray-600">Your upcoming appointments</p>
+        <p className="text-sm text-gray-600">{t('upcomingAppointments')}</p>
       </div>
 
       {/* Upcoming Appointments */}
@@ -900,7 +922,7 @@ const FixedPregnancyApp = () => {
           <Settings className="w-6 h-6 text-purple-600" />
           <h2 className="text-lg font-semibold text-gray-800">{t('settings')}</h2>
         </div>
-        <p className="text-sm text-gray-600">App preferences and account settings</p>
+        <p className="text-sm text-gray-600">{t('appPreferences')}</p>
       </div>
 
       {/* Settings Options */}
@@ -908,21 +930,21 @@ const FixedPregnancyApp = () => {
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Bell className="w-5 h-5 text-gray-600" />
-            <span className="font-medium text-gray-800">Notifications</span>
+            <span className="font-medium text-gray-800">{t('notifications')}</span>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </div>
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Shield className="w-5 h-5 text-gray-600" />
-            <span className="font-medium text-gray-800">Privacy</span>
+            <span className="font-medium text-gray-800">{t('privacy')}</span>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </div>
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Globe className="w-5 h-5 text-gray-600" />
-            <span className="font-medium text-gray-800">Language</span>
+            <span className="font-medium text-gray-800">{t('language')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <span className="text-sm text-gray-600">{language === 'da' ? 'Dansk' : 'English'}</span>
@@ -932,7 +954,7 @@ const FixedPregnancyApp = () => {
         <div className="p-4 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Download className="w-5 h-5 text-gray-600" />
-            <span className="font-medium text-gray-800">Export Data</span>
+            <span className="font-medium text-gray-800">{t('exportData')}</span>
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </div>
