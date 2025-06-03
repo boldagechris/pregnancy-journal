@@ -28,7 +28,8 @@ import {
   Video,
   Mail,
   Info,
-  ExternalLink
+  ExternalLink,
+  BookOpen
 } from 'lucide-react';
 
 // Simple translation function
@@ -102,7 +103,17 @@ const useTranslation = () => {
       // GDPR
       gdprTitle: 'Databeskyttelse (GDPR)',
       gdprDescription: 'I henhold til GDPR skal vi have dit samtykke til at behandle dine personoplysninger.',
-      acceptAndContinue: 'Acceptér og fortsæt'
+      acceptAndContinue: 'Acceptér og fortsæt',
+      journal: 'Journal',
+      journalForNextMeeting: 'Journal til næste møde',
+      writeJournal: 'Skriv i journalen',
+      journalPlaceholder: 'Skriv dine tanker, spørgsmål eller bekymringer til næste møde med jordemoderen...',
+      saveJournal: 'Gem journal',
+      journalSaved: 'Journal gemt!',
+      journalSavedDesc: 'Din journal er nu klar til næste møde med jordemoderen',
+      sendToMidwife: 'Send til jordemoder',
+      journalSent: 'Journal sendt!',
+      journalSentDesc: 'Din journal er nu sendt til jordemoderen'
     },
     
     en: {
@@ -171,7 +182,17 @@ const useTranslation = () => {
       // GDPR
       gdprTitle: 'Data Protection (GDPR)',
       gdprDescription: 'In accordance with GDPR, we need your consent to process your personal information.',
-      acceptAndContinue: 'Accept and continue'
+      acceptAndContinue: 'Accept and continue',
+      journal: 'Journal',
+      journalForNextMeeting: 'Journal for next meeting',
+      writeJournal: 'Write in journal',
+      journalPlaceholder: 'Write your thoughts, questions, or concerns for the next midwife meeting...',
+      saveJournal: 'Save journal',
+      journalSaved: 'Journal saved!',
+      journalSavedDesc: 'Your journal is now ready for the next midwife meeting',
+      sendToMidwife: 'Send to midwife',
+      journalSent: 'Journal sent!',
+      journalSentDesc: 'Your journal has been sent to the midwife'
     }
   };
 
@@ -460,7 +481,7 @@ const FixedPregnancyApp = () => {
         {[
           { id: 'home', icon: Heart, label: t('home') },
           { id: 'data', icon: Activity, label: t('data') },
-          { id: 'sharing', icon: Users, label: t('sharing') },
+          { id: 'journal', icon: BookOpen, label: t('journal') },
           { id: 'calendar', icon: Calendar, label: t('calendar') },
           { id: 'settings', icon: Settings, label: t('settings') }
         ].map(({ id, icon: Icon, label }) => (
@@ -664,6 +685,87 @@ const FixedPregnancyApp = () => {
     </div>
   );
 
+  // Journal View
+  const JournalView = () => {
+    const [journalText, setJournalText] = useState('');
+    const [showSaved, setShowSaved] = useState(false);
+    const [showSent, setShowSent] = useState(false);
+
+    const handleSave = () => {
+      if (journalText.trim()) {
+        setShowSaved(true);
+        setTimeout(() => setShowSaved(false), 3000);
+      }
+    };
+
+    const handleSendToMidwife = () => {
+      if (journalText.trim()) {
+        setShowSent(true);
+        setTimeout(() => {
+          setShowSent(false);
+          setJournalText('');
+        }, 3000);
+      }
+    };
+
+    return (
+      <div className="p-4 space-y-6">
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 rounded-2xl border border-purple-200">
+          <div className="flex items-center space-x-3 mb-3">
+            <BookOpen className="w-6 h-6 text-purple-600" />
+            <h2 className="text-lg font-semibold text-gray-800">{t('journalForNextMeeting')}</h2>
+          </div>
+          <p className="text-sm text-gray-600">{t('writeJournal')}</p>
+        </div>
+
+        {showSaved ? (
+          <div className="bg-green-50 p-4 rounded-2xl border border-green-200 text-center">
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Check className="w-6 h-6 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('journalSaved')}</h3>
+            <p className="text-sm text-gray-600">{t('journalSavedDesc')}</p>
+          </div>
+        ) : showSent ? (
+          <div className="bg-blue-50 p-4 rounded-2xl border border-blue-200 text-center">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Mail className="w-6 h-6 text-blue-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('journalSent')}</h3>
+            <p className="text-sm text-gray-600">{t('journalSentDesc')}</p>
+          </div>
+        ) : (
+          <div className="bg-white p-4 rounded-2xl border border-gray-200">
+            <textarea
+              value={journalText}
+              onChange={(e) => setJournalText(e.target.value)}
+              placeholder={t('journalPlaceholder')}
+              className="w-full h-64 p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none"
+            />
+            <div className="mt-4 space-y-3">
+              <button
+                onClick={handleSave}
+                disabled={!journalText.trim()}
+                className="w-full bg-purple-500 text-white py-3 rounded-xl font-medium flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                <BookOpen className="w-5 h-5" />
+                <span>{t('saveJournal')}</span>
+              </button>
+              <button
+                onClick={handleSendToMidwife}
+                disabled={!journalText.trim()}
+                className="w-full bg-blue-500 text-white py-3 rounded-xl font-medium flex items-center justify-center space-x-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              >
+                <Mail className="w-5 h-5" />
+                <span>{t('sendToMidwife')}</span>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Settings View
   const SettingsView = () => (
     <div className="p-4 space-y-6">
@@ -761,6 +863,8 @@ const FixedPregnancyApp = () => {
     switch (currentView) {
       case 'data': 
         return <DataView />;
+      case 'journal':
+        return <JournalView />;
       case 'sharing': 
         return <SharingView />;
       case 'calendar': 
